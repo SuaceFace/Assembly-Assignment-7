@@ -1,6 +1,7 @@
 
 
 
+
 Title Assignment 7
 
 COMMENT !
@@ -73,13 +74,13 @@ main endp
 ; Operation:
 ;   Fill the array and count the number of elements
 ;
-enter_elem proc
-	push ebp
+enter_elem proc uses ebp ecx ebx
+	
 	mov ebp, esp
-	push ecx
+	
     mov ecx, 40						;loop counter
-	push ebx
-	mov ebx, [ebp+8]
+	
+	mov ebx, [ebp+16]
 
 
 	InputLoop: 
@@ -93,10 +94,8 @@ enter_elem proc
 	ExitLoop:
 	mov eax, 40
 	sub eax, ecx					;This is the count of how many values were stored.
-	mov [ebp+12], eax
-	pop ebx							;restore values
-	pop ecx
-	pop ebp
+	mov [ebp+20], eax
+	
 	ret 4							;cleans stack of input.
 enter_elem endp
 
@@ -111,14 +110,10 @@ enter_elem endp
 ;  print out the array with space between values.
 ;
 
-print_arr proc
-  push ebp
+print_arr proc uses ebp ecx ebx eax
    mov ebp, esp
-   push eax
-   push ebx
-   push ecx
-   mov ecx, [ebp+12] ; loop counter
-   mov ebx, [ebp+8]		;array offset
+   mov ecx, [ebp+24] ; loop counter
+   mov ebx, [ebp+20]		;array offset
 
 	PrintLoop: 
 		mov eax, [ebx]
@@ -127,13 +122,7 @@ print_arr proc
 		call writeChar
 		add ebx, DWORD
 	LOOP PrintLoop
-
-	pop ecx
-	pop ebx
-	pop eax
-	pop ebp
 	ret 8
-
 print_arr endp
 
 ; ================================================
@@ -147,23 +136,20 @@ print_arr endp
 ;   sort the array
 ;
 
-sort_arr proc
+sort_arr proc uses ebp eax ebx ecx
 
    ; FILL YOUR CODE HERE
    ; YOU NEED TO CALL COMPARE_AND_SWAP PROCEDURE 
-   push ebp
    mov ebp, esp
-   push eax
-   push ebx
-   push ecx
-   mov ecx, [ebp+12] ;loop counter
+
+   mov ecx, [ebp+24] ;loop counter
    dec ecx			;outer loop at n-1
    
 	SortOuterLoop: 
 		;I'm going to brute force a really crappy bubble sort
 		push ecx
-		mov ebx, [ebp+8]		;Begin each inner loop at array offset
-		mov ecx, [ebp+12]		;inner loop does n iterations
+		mov ebx, [ebp+20]		;Begin each inner loop at array offset
+		mov ecx, [ebp+24]		;inner loop does n iterations
 		SortInnerLoop:
 			push ebx
 			add ebx, DWORD		
@@ -172,10 +158,6 @@ sort_arr proc
 		LOOP SortInnerLoop
 		pop ecx
 	LOOP SortOuterLoop
-	pop ecx
-	pop ebx
-	pop eax
-	pop ebp
 	ret 8
 sort_arr endp
 
@@ -190,19 +172,14 @@ sort_arr endp
 ;  compare and call SWAP ONLY IF Y < X 
 ;
 
-compare_and_swap proc
+compare_and_swap proc uses ebp eax ebx ecx edx
 
    ; FILL YOUR CODE HERE
    ; YOU NEED TO CALL SWAP PROCEDURE 
-   push ebp
    mov ebp, esp
-   push eax					
-   push ebx	
-   push ecx
-   push edx
 
-   mov eax, [ebp+8]			;eax = y
-   mov ebx, [ebp+12]		;ebx = x
+   mov eax, [ebp+24]		;eax = y
+   mov ebx, [ebp+28]		;ebx = x
    mov ecx, [ebx]			;dereference
    mov edx, [eax]			;dereference
    cmp ecx, edx
@@ -214,11 +191,7 @@ compare_and_swap proc
 	call swap
 
 	Complete:
-	pop edx
-	pop ecx
-	pop ebx
-	pop eax
-	pop ebp
+
 	ret 8
 
 compare_and_swap endp
@@ -235,26 +208,16 @@ compare_and_swap endp
 ;  swap the two inputs
 ;
 
-swap proc
-	push ebp
+swap proc uses ebp eax ebx ecx edx
    mov ebp, esp
-   push eax				;store values
-   push ebx
-   push ecx
-   push edx
 
-   mov eax, [ebp+8]      
-   mov ebx, [ebp+12]    
+   mov eax, [ebp+24]      
+   mov ebx, [ebp+28]    
    mov edx, [eax]        ;This stores the values, then puts them back swapped. eax and ebx are addresses, which is why this is so jank.
    mov ecx, [ebx]        
    mov [eax], ecx        
    mov [ebx], edx 
 
-   pop edx				;restore values
-   pop ecx
-   pop ebx
-   pop eax
-   pop ebp
    ret 8				;clean inputs
 
 swap endp
@@ -281,3 +244,4 @@ Array sorted in descending order:
 99 76 34 17 8 5 4 3 2 1
 C:\Users\20631837\Desktop\Project32_VS2022\Debug\Project.exe (process 11372) exited with code 0.
 @
+
